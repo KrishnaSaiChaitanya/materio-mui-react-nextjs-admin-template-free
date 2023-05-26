@@ -300,7 +300,6 @@ const LoginPage = () => {
                     <img src='../../loading.gif' alt='loading' style={{ height: '250px' }} />
                   </div>
                 ) : (
-                  //  <DialogContentText sx={{ mb: 3 }}></DialogContentText>
                   <Box sx={{ mt: 3 }}>
                     <TextField
                       sx={{ mb: 4 }}
