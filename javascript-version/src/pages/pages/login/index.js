@@ -74,6 +74,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 const LoginPage = () => {
   // ** State
   // ** State
+  const [loading, setloading] = useState(true)
   const [open, setOpen] = useState(false)
   const [username, setusername] = useState('')
   const [openSuccess, setopenSuccess] = useState(false)
@@ -96,7 +97,10 @@ const LoginPage = () => {
       setopenSuccess(true)
       setTimeout(() => {
         setOpen(!open)
-      }, 2000)
+        setTimeout(() => {
+          setloading(false)
+        }, 2000)
+      }, 1500)
     } else {
       setopenError(true)
     }
@@ -291,42 +295,50 @@ const LoginPage = () => {
             <Dialog open={open} onClose={handleClose} aria-labelledby='form-dialog-title'>
               <DialogTitle id='form-dialog-title'>User Details</DialogTitle>
               <DialogContent sx={{ m: 3 }}>
-                <DialogContentText sx={{ mb: 3 }}></DialogContentText>
-                <TextField
-                  sx={{ mb: 4 }}
-                  value={Data ? Data.username : 'Username'}
-                  fullWidth
-                  id='outlined-basic'
-                  label='Username'
-                />
-                <TextField
-                  sx={{ mb: 4 }}
-                  value={Data ? Data.email : 'Email'}
-                  fullWidth
-                  id='outlined-basic'
-                  label='Email'
-                />
-                <TextField
-                  sx={{ mb: 4 }}
-                  value={Data ? Data.firstName : 'First Name'}
-                  fullWidth
-                  id='outlined-basic'
-                  label='First Name'
-                />
-                <TextField
-                  sx={{ mb: 4 }}
-                  value={Data ? Data.lastName : 'Last Name'}
-                  fullWidth
-                  id='outlined-basic'
-                  label='Last Name'
-                />
-                <TextField
-                  sx={{ mb: 4 }}
-                  value={Data ? Data.gender : 'gender'}
-                  fullWidth
-                  id='outlined-basic'
-                  label='Gender'
-                />
+                {loading ? (
+                  <div className='m-3'>
+                    <img src='../../loading.gif' alt='loading' style={{ height: '250px' }} />
+                  </div>
+                ) : (
+                  //  <DialogContentText sx={{ mb: 3 }}></DialogContentText>
+                  <Box sx={{ mt: 3 }}>
+                    <TextField
+                      sx={{ mb: 4 }}
+                      value={Data ? Data.username : 'Username'}
+                      fullWidth
+                      id='outlined-basic'
+                      label='Username'
+                    />
+                    <TextField
+                      sx={{ mb: 4 }}
+                      value={Data ? Data.email : 'Email'}
+                      fullWidth
+                      id='outlined-basic'
+                      label='Email'
+                    />
+                    <TextField
+                      sx={{ mb: 4 }}
+                      value={Data ? Data.firstName : 'First Name'}
+                      fullWidth
+                      id='outlined-basic'
+                      label='First Name'
+                    />
+                    <TextField
+                      sx={{ mb: 4 }}
+                      value={Data ? Data.lastName : 'Last Name'}
+                      fullWidth
+                      id='outlined-basic'
+                      label='Last Name'
+                    />
+                    <TextField
+                      sx={{ mb: 4 }}
+                      value={Data ? Data.gender : 'gender'}
+                      fullWidth
+                      id='outlined-basic'
+                      label='Gender'
+                    />
+                  </Box>
+                )}
               </DialogContent>
               <DialogActions className='dialog-actions-dense'>
                 <Button onClick={handleClose}>Continue</Button>
