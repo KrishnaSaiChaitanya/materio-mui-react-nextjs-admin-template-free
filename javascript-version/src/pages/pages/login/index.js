@@ -1,16 +1,23 @@
 // ** React Imports
 import { useState } from 'react'
+import * as React from 'react'
 
 // ** Next Imports
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 // ** MUI Components
-import Box from '@mui/material/Box'
+import Snackbar from '@mui/material/Snackbar'
+import MuiAlert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
-import Divider from '@mui/material/Divider'
-import Checkbox from '@mui/material/Checkbox'
+import Dialog from '@mui/material/Dialog'
 import TextField from '@mui/material/TextField'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContentText from '@mui/material/DialogContentText'
+import Box from '@mui/material/Box'
+import Divider from '@mui/material/Divider'
 import InputLabel from '@mui/material/InputLabel'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
@@ -36,8 +43,11 @@ import themeConfig from 'src/configs/themeConfig'
 // ** Layout Import
 import BlankLayout from 'src/@core/layouts/BlankLayout'
 
+import toast from 'react-hot-toast'
+
 // ** Demo Imports
 import FooterIllustrationsV1 from 'src/views/pages/auth/FooterIllustration'
+import { Checkbox } from '@mui/material'
 
 // ** Styled Components
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -57,12 +67,55 @@ const FormControlLabel = styled(MuiFormControlLabel)(({ theme }) => ({
   }
 }))
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />
+})
+
 const LoginPage = () => {
   // ** State
+  // ** State
+  const [open, setOpen] = useState(false)
+  const [username, setusername] = useState('')
+  const [openSuccess, setopenSuccess] = useState(false)
+  const [openError, setopenError] = useState(false)
+
+  const OnLogin = async () => {
+    const response = await fetch('https://dummyjson.com/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: username,
+        password: values.password
+      })
+    })
+    const data = await response.json()
+    setData(data)
+
+    console.log('heloo ', username, values.password)
+    if (data.token) {
+      setopenSuccess(true)
+      setTimeout(() => {
+        setOpen(!open)
+      }, 2000)
+    } else {
+      setopenError(true)
+    }
+    console.log(response)
+  }
+
+  const handleClickOpen = () => setOpen(true)
+
+  const handleClose = () => {
+    setOpen(false)
+    router.push('/')
+  }
+
   const [values, setValues] = useState({
     password: '',
     showPassword: false
   })
+
+  const [Data, setData] = useState([])
 
   // ** Hook
   const theme = useTheme()
@@ -163,11 +216,20 @@ const LoginPage = () => {
             </Typography>
             <Typography variant='body2'>Please sign-in to your account and start the adventure</Typography>
           </Box>
+          {/* <InputLabel htmlFor='username'>Username</InputLabel> */}
+          <TextField
+            fullWidth
+            sx={{ mb: 4 }}
+            label='username'
+            id='username'
+            value={username}
+            onChange={e => setusername(e.target.value)}
+          />
           <form noValidate autoComplete='off' onSubmit={e => e.preventDefault()}>
-            <TextField autoFocus fullWidth id='email' label='Email' sx={{ marginBottom: 4 }} />
             <FormControl fullWidth>
               <InputLabel htmlFor='auth-login-password'>Password</InputLabel>
               <OutlinedInput
+                sx={{ mb: 4 }}
                 label='Password'
                 value={values.password}
                 id='auth-login-password'
@@ -195,15 +257,82 @@ const LoginPage = () => {
                 <LinkStyled onClick={e => e.preventDefault()}>Forgot Password?</LinkStyled>
               </Link>
             </Box>
-            <Button
-              fullWidth
-              size='large'
-              variant='contained'
-              sx={{ marginBottom: 7 }}
-              onClick={() => router.push('/')}
-            >
+            <Button fullWidth size='large' variant='contained' sx={{ marginBottom: 7 }} onClick={() => OnLogin()}>
               Login
             </Button>
+            <Box
+              sx={{
+                display: 'flex',
+                textAlign: 'center',
+                alignItems: 'center',
+                flexDirection: 'column',
+                '& svg': { mb: 2 }
+              }}
+            ></Box>
+
+            {/* <Snackbar open={openSuccess} autoHideDuration={6000}>
+              <Alert severity='success' sx={{ width: '100%' }}>
+                This is a success message!
+              </Alert>
+            </Snackbar> */}
+
+            <Snackbar open={openSuccess} autoHideDuration={6000} onClose={() => setopenSuccess(false)}>
+              <Alert onClose={() => setopenSuccess(false)} severity='success' sx={{ width: '100%' }}>
+                Sucussesfully Logged into Your Account!
+              </Alert>
+            </Snackbar>
+
+            <Snackbar open={openError} autoHideDuration={6000} onClose={() => setopenError(false)}>
+              <Alert severity='error' onClose={() => setopenError(false)} sx={{ width: '100%' }}>
+                Invalid User
+              </Alert>
+            </Snackbar>
+
+            <Dialog open={open} onClose={handleClose} aria-labelledby='form-dialog-title'>
+              <DialogTitle id='form-dialog-title'>User Details</DialogTitle>
+              <DialogContent sx={{ m: 3 }}>
+                <DialogContentText sx={{ mb: 3 }}></DialogContentText>
+                <TextField
+                  sx={{ mb: 4 }}
+                  value={Data ? Data.username : 'Username'}
+                  fullWidth
+                  id='outlined-basic'
+                  label='Username'
+                />
+                <TextField
+                  sx={{ mb: 4 }}
+                  value={Data ? Data.email : 'Email'}
+                  fullWidth
+                  id='outlined-basic'
+                  label='Email'
+                />
+                <TextField
+                  sx={{ mb: 4 }}
+                  value={Data ? Data.firstName : 'First Name'}
+                  fullWidth
+                  id='outlined-basic'
+                  label='First Name'
+                />
+                <TextField
+                  sx={{ mb: 4 }}
+                  value={Data ? Data.lastName : 'Last Name'}
+                  fullWidth
+                  id='outlined-basic'
+                  label='Last Name'
+                />
+                <TextField
+                  sx={{ mb: 4 }}
+                  value={Data ? Data.gender : 'gender'}
+                  fullWidth
+                  id='outlined-basic'
+                  label='Gender'
+                />
+              </DialogContent>
+              <DialogActions className='dialog-actions-dense'>
+                <Button onClick={handleClose}>Continue</Button>
+              </DialogActions>
+            </Dialog>
+
             <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
               <Typography variant='body2' sx={{ marginRight: 2 }}>
                 New on our platform?
